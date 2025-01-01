@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Auth Modal 自定义样式 */
+.auth-modal .ant-modal-content {
+  background: #1A1F2E;
+  color: white;
+}
+
+.auth-modal .ant-modal-header {
+  background: #1A1F2E;
+  border-bottom: none;
+}
+
+.auth-modal .ant-modal-title {
+  color: white !important;
+}
+
+.auth-modal .ant-form-item-label > label {
+  color: #9CA3AF;
+}
+
+.auth-modal .ant-input-affix-wrapper {
+  background: #0A0F1C;
+  border-color: #4B5563;
+}
+
+.auth-modal .ant-input-affix-wrapper:hover,
+.auth-modal .ant-input-affix-wrapper:focus,
+.auth-modal .ant-input-affix-wrapper-focused {
+  border-color: #3B82F6;
+}
+
+.auth-modal .ant-input-affix-wrapper .ant-input {
+  background: transparent;
+  color: white;
+}
+
+.auth-modal .ant-input-password-icon {
+  color: #9CA3AF;
+}
+
+.auth-modal .ant-btn-primary {
+  background: #3B82F6;
+}
