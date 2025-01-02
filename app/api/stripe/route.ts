@@ -19,7 +19,7 @@ interface PlanConfig {
 const PLANS: Record<string, PlanConfig> = {
   free: { price: 0 },
   pro: { price_id: 'price_1QbLQeIKDyoXLJh07mXzAdm4' },
-  enterprise: { price_id: process.env.STRIPE_ENTERPRISE_PRICE_ID }
+  enterprise: { price_id: 'price_1Qc7j6IKDyoXLJh0P2rRT7IV' }
 };
 
 export async function POST(request: NextRequest) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import { supabase } from '../lib/supabase';
 import { message } from 'antd';
@@ -26,10 +26,18 @@ const HeroSection = () => {
   const [isMounted, setIsMounted] = useState(false);
   const [streamingContent, setStreamingContent] = useState<string>('');
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+  const resultContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // 添加自动滚动效果
+  useEffect(() => {
+    if (resultContainerRef.current) {
+      resultContainerRef.current.scrollTop = resultContainerRef.current.scrollHeight;
+    }
+  }, [streamingContent]);
 
   if (!isMounted) {
     return <div className="w-full min-h-[calc(100vh-180px)] bg-[#0A0F1C]"></div>;
@@ -204,8 +212,6 @@ const HeroSection = () => {
 
   // 修改分析处理函数
   const handleAnalysis = async () => {
-    console.log('开始分析图片:', selectedFiles);
-    
     if (selectedFiles.length === 0) {
       setError('请先选择图片');
       return;
@@ -216,7 +222,6 @@ const HeroSection = () => {
     setStreamingContent('');  // 清空之前的内容
     
     try {
-      console.log('开始处理图片...');
       // 添加图片大小和格式检查
       for (const file of selectedFiles) {
         if (file.size > 10 * 1024 * 1024) { // 10MB 限制
@@ -227,16 +232,20 @@ const HeroSection = () => {
         }
       }
 
+      // 转换所有图片为 base64
+      const base64Images = await Promise.all(
+        selectedFiles.map(file => fileToBase64(file))
+      );
+
       const requestBody = {
         prompt: "分析这些图片的设计和布局，并提供详细的前端实现建议",
-        images: uploadedImages.map(img => img.url), // 使用上传后的图片 URL
+        images: base64Images,
         options: {
           temperature: 0.7,
           maxTokens: 1024
         }
       };
-      console.log('发送请求:', requestBody);
-
+      
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -385,10 +394,24 @@ const HeroSection = () => {
                 <p className="text-red-500 text-sm text-center">{error}</p>
               )}
 
-              {streamingContent && (
+              {(streamingContent || isLoading) && (
                 <div className="mt-4 p-4 bg-[#0A0F1C] rounded-lg">
-                  <h3 className="text-gray-300 font-semibold mb-2">Analysis Result:</h3>
-                  <p className="text-gray-400 text-sm whitespace-pre-wrap">{streamingContent}</p>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-gray-300 font-semibold">Analysis Result:</h3>
+                    {isLoading && (
+                      <div className="flex items-center space-x-1">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse delay-100"></div>
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse delay-200"></div>
+                      </div>
+                    )}
+                  </div>
+                  <div 
+                    ref={resultContainerRef}
+                    className="max-h-[400px] overflow-y-auto custom-scrollbar"
+                  >
+                    <p className="text-gray-400 text-sm whitespace-pre-wrap">{streamingContent}</p>
+                  </div>
                 </div>
               )}
 
